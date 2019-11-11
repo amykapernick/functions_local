@@ -16,7 +16,7 @@ app.get('/analytics-emails', (req, res) => {
 	let msg,
 		month = 'October',
 		year = '2019',
-		reportUrl = `https://analytics.aimhigherweb.design/{website}-${year}${month}`
+		reportUrl = `https://analytics.aimhigherweb.design/{website}-${year}${month.toLocaleUpperCase()}`
 
 	customers.forEach(customer => {
 		msg = {
@@ -26,7 +26,7 @@ app.get('/analytics-emails', (req, res) => {
 				name: 'Amy | AimHigher Web Design',
 				email: 'amy@aimhigherweb.design',
 			},
-			subject: `${customer.company} Analytics Report - ${month}`,
+			subject: `${customer.company} Analytics Report - ${month} ${year}`,
 		}
 
 		customer.contacts.forEach(contact => {
