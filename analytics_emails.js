@@ -1,9 +1,19 @@
 const customers = [
 	{
-		contact: [
+		contacts: [
 			{
 				name: 'Amy',
 				email: 'amy@aimhigherwebdesign.com.au',
+			},
+			{
+				name: 'Amy 2',
+				email: 'amy@aimhigherwebdesign.com',
+			},
+		],
+		extras: [
+			{
+				name: 'Ming',
+				email: 'amy@yowconference.com',
 			},
 		],
 		company: 'AimHigher Web Design',

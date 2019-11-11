@@ -20,12 +20,28 @@ app.get('/analytics-emails', (req, res) => {
 
 	customers.forEach(customer => {
 		msg = {
-			to: customer.contact[0].email,
-			from: 'amy@aimhigherweb.design',
+			to: [],
+			cc: [],
+			from: {
+				name: 'Amy | AimHigher Web Design',
+				email: 'amy@aimhigherweb.design',
+			},
 			subject: `${customer.company} Analytics Report - ${month}`,
 		}
 
-		let name = customer.contact[0].name,
+		customer.contacts.forEach(contact => {
+			msg.to.push({
+				email: contact.email,
+			})
+		})
+
+		customer.extras.forEach(contact => {
+			msg.cc.push({
+				email: contact.email,
+			})
+		})
+
+		let name = customer.contacts[0].name,
 			text = {},
 			html = {},
 			url = reportUrl.replace('{website}', customer.sites[0].slug)
@@ -68,6 +84,8 @@ app.get('/analytics-emails', (req, res) => {
 
 		msg.text = `${text.opening}\n${text.report}\n${text.ending}`
 		msg.html = `${html.opening}${html.report}${html.ending}`
+
+		// console.log(msg)
 
 		sgMail.send(msg)
 
