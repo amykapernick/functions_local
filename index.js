@@ -46,6 +46,12 @@ app.get('/analytics-emails', (req, res) => {
 			html = {},
 			url = reportUrl.replace('{website}', customer.sites[0].slug)
 
+		if (customer.contacts.length == 2) {
+			name = `${name} and ${customer.contacts[1].name}`
+		} else if (customer.contacts.length == 3) {
+			name = `${name}, ${customer.contacts[1].name} and ${customer.contacts[2].name}`
+		}
+
 		text.opening = `Hi ${name},\n`
 		text.report = `I've put together your analytics report for ${month} and you can view it here - ${url}\n
             You can print it off if you like, but you'll then lose a lot of the interactivity so I recommend you view it on a computer.`
