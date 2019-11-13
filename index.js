@@ -35,11 +35,13 @@ app.get('/analytics-emails', (req, res) => {
 			})
 		})
 
-		customer.extras.forEach(contact => {
-			msg.cc.push({
-				email: contact.email,
+		if (customers.extras) {
+			customer.extras.forEach(contact => {
+				msg.cc.push({
+					email: contact.email,
+				})
 			})
-		})
+		}
 
 		let name = customer.contacts[0].name,
 			text = {},
@@ -97,9 +99,9 @@ app.get('/analytics-emails', (req, res) => {
 
 		res.write(`<h2>Sent ${customer.company} - ${month} ${year}</h2>`)
 		res.write(`${html.url}`)
-
-		res.end()
 	})
+
+	res.end()
 })
 
 app.listen(3000, () => {
