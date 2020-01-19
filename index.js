@@ -2,23 +2,24 @@ require('dotenv').config()
 
 const express = require('express'),
 	app = express(),
+	bodyParser = require('body-parser'),
 	sgMail = require('@sendgrid/mail'),
 	customers = require('./analytics_emails').customers
+testCustomers = require('./analytics_emails_test').customers
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-app.get('/', (req, res) => {
-	res.send('<h1>Express App</h1>')
-})
+app.use(bodyParser.urlencoded({ extended: true }))
 
-app.get('/analytics-emails', (req, res) => {
-	res.write('<h1>Sending Emails</h1>')
+const sendEmails = (req, res, details) => {
+	console.log('running')
+	console.log(details)
 	let msg,
-		month = 'October',
-		year = '2019',
-		reportUrl = `https://analytics.aimhigherweb.design/{website}-${year}${month.toLocaleUpperCase()}`
+		month = details.month,
+		year = details.year,
+		reportUrl = `https://analytics.aimhigherweb.design/{website}-${year}${month.toLowerCase()}`
 
-	customers.forEach(customer => {
+	testCustomers.forEach(customer => {
 		msg = {
 			to: [],
 			cc: [],
@@ -100,10 +101,23 @@ app.get('/analytics-emails', (req, res) => {
 		res.write(`<h2>Sent ${customer.company} - ${month} ${year}</h2>`)
 		res.write(`${html.url}`)
 	})
-
 	res.end()
+}
+
+app.get('/', (req, res) => {
+	res.send('<h1>Node Functions</h1><ul><li><a href="/analytics-emails">Monthly Analytics Reports</a></li></ul>')
 })
 
-app.listen(3000, () => {
-	console.log('Example app listening on port 3000!')
+app.get('/analytics-emails', (req, res) => {
+	res.sendFile('./analytics-emails.html', { root: './' })
+})
+
+app.post('/analytics-emails', (req, res) => {
+	const details = req.body
+
+	sendEmails(req, res, details)
+})
+
+app.listen(process.env.PORT || 3000, () => {
+	console.log(`Express listening on port ${process.env.PORT || 3000}`)
 })

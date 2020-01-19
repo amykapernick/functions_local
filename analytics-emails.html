@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+		<title>Send Analytics Emails</title>
+		<base href="/" />
+	</head>
+	<body>
+		<h1>Send Bulk Emails</h1>
+		<form action="/analytics-emails" method="POST">
+			<label for="month">
+				Month
+				<input name="month" type="text" id="month" />
+			</label>
+			<label for="year">
+				Year
+				<input name="year" type="text" id="year" />
+			</label>
+
+			<input type="submit" value="Send Emails" />
+		</form>
+	</body>
+</html>
