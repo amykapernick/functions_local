@@ -12,14 +12,12 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 app.use(bodyParser.urlencoded({ extended: true }))
 
 const sendEmails = (req, res, details) => {
-	console.log('running')
-	console.log(details)
 	let msg,
 		month = details.month,
 		year = details.year,
 		reportUrl = `https://analytics.aimhigherweb.design/{website}-${year}${month.toLowerCase()}`
 
-	testCustomers.forEach(customer => {
+		customers.forEach(customer => {
 		msg = {
 			to: [],
 			cc: [],
@@ -101,6 +99,7 @@ const sendEmails = (req, res, details) => {
 		res.write(`<h2>Sent ${customer.company} - ${month} ${year}</h2>`)
 		res.write(`${html.url}`)
 	})
+	res.write(`<br/><a href="/analytics-emails">Start Again</a>`)
 	res.end()
 }
 

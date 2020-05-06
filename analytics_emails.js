@@ -43,10 +43,6 @@ const customers = [
 				name: 'Kangaroo Inn',
 				slug: 'kangarooinn',
 			},
-			{
-				name: 'Kangaroo Inn Bookings',
-				slug: 'kangarooinnbookings',
-			},
 		],
 	},
 	{
