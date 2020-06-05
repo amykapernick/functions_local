@@ -6,7 +6,8 @@ htmlconvert = require('html-to-markdown')
 const fetchAgenda = async () => {
     const pages = ['agenda', 'speakers', 'workshops'],
     talkUrls = [],
-    speakerUrls = []
+    speakerUrls = [],
+    workshopUrls = []
 
     pages.forEach(async (page) => {
         const results = await fetch(`https://ndcoslo.com/${page}`),
@@ -166,6 +167,7 @@ const fetchAgenda = async () => {
             })
         }
         else if (page == 'speakers') {
+            return
             $('section .msnry-container.grid-container .grid-item').map((i, el) => {
                 el.children.forEach(c => {
                     const speaker = {}
@@ -179,7 +181,7 @@ const fetchAgenda = async () => {
                                     if(a.name == 'h2') {
                                         speaker.name = a.children[0].data
                                     }
-                                    else if(a.attribs && a.attribs.class == 'subtitle') {
+                                    else if(a.attribs && !a.attribs.class) {
                                         speaker.role = a.children[0].data
                                     }
                                 })
@@ -204,6 +206,10 @@ const fetchAgenda = async () => {
             })
 
             speakerUrls.forEach(async (speaker) => {
+                // if(speaker !== 'https://ndcoslo.com/speaker/amy-kapernick/') {
+                //     return
+                // }
+
                 const results = await fetch(speaker).then(res => res).catch(err => console.log(`error ${speaker}`))
                 
                 if(!results) {
@@ -227,9 +233,12 @@ const fetchAgenda = async () => {
                                     a.children.forEach(e => {
                                         if(e.name == 'h1') {
                                             profile.name = e.children[0].data.replace(/(^(\s+))|((\s+)$)/g, '')
-                                        }
-                                        else if(e.attribs && e.attribs.class == 'subtitle') {
-                                            profile.role = e.children[0].data
+
+                                            e.children.forEach(f => {
+                                                if(f.name == 'span') {
+                                                    profile.role = f.children[0].data
+                                                }
+                                            })
                                         }
                                         else if (e.name == 'img') {
                                             profile.image = e.attribs.src
@@ -307,9 +316,177 @@ const fetchAgenda = async () => {
             })
 
         }
+        else if (page == 'workshops') {
+            $('section.day .msnry-container.grid-container').map((i, el) => {
+                el.children.forEach(a => {
+                    if(a.name == 'div') {
+                        a.children.forEach(b => {
+                            if(b.name == 'a') {
+                                workshopUrls.push(b.attribs.href)
+                            }
+                        })
+                    }
+                })
+            })
+
+            workshopUrls.forEach(async (talk) => {
+                // if(talk !== 'https://ndcoslo.com/workshop/front-end-web-fundamentals/') {
+                //     return
+                // }
+
+                const results = await fetch(talk).then(res => res).catch(err => console.log(`error ${talk}`))
+                
+                if(!results) {
+                    console.log(`error on talk ${talk}`)
+                    return
+                }
+
+                const body = await results.text(),
+                details = {
+                    link: talk,
+                    speakers: []
+                },
+                talkmatch = talk.match(/https:\/\/ndcoslo.com\/(talk|workshop)\/(.+)\//),
+                slug = talkmatch[2],
+                type = talkmatch[1]
+                
+                const $ = cheerio.load(body)
+        
+                $('.event-wrapper').map((i, el) => {
+                    el.children.forEach(a => {
+                        if(a.name == 'article') {
+                            let abstract = ''
+                            a.children.forEach(b => {
+                                if(b.attribs && b.attribs.class == 'masthead') {
+                                    b.children.forEach(c => {
+                                        if(c.name == 'h1') {
+                                            c.children.forEach(d => {
+                                                if(d.name == 'span') {
+                                                    details.title = d.children[0].data.replace('Workshop: ', '')
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                                else if(b.attribs && b.attribs.class == 'preamble') {
+                                    b.children.forEach(c => {
+                                        if(c.name == 'p') {
+                                            c.children.forEach(d => {
+                                                if(d.type == 'text') {
+                                                    abstract = `${abstract}${d.data}`
+                                                }
+                                                else if(d.name == 'br') {
+                                                    abstract = `${abstract}\n`
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                                else if(b.attribs && b.attribs.class == 'body video-container') {
+                                    b.children.forEach(c => {
+                                        if(c.name == 'p') {
+                                            abstract = `${abstract}\n\n`
+
+                                            c.children.forEach(d => {
+                                                if(d.type == 'text') {
+                                                    abstract = `${abstract}${d.data}`
+                                                }
+                                                else if(d.name == 'br') {
+                                                    abstract = `${abstract}\n`
+                                                }
+                                                else if(d.name == 'b' || d.name == 'strong') {
+                                                    abstract = `${abstract}\n### ${d.children[0].data}`
+                                                }
+                                            })
+                                        }
+                                        else if(c.name == 'h2') {
+                                            abstract = `${abstract}\n## ${c.children[0].data}`
+                                        }
+                                        else if(c.name == 'ul') {
+                                            abstract = `${abstract}\n`
+
+                                            c.children.forEach(d => {
+                                                if(d.name == 'li') {
+                                                    abstract = `${abstract}\n- ${d.children[0].data}`
+                                                }
+                                            })
+
+                                            abstract = `${abstract}\n`
+                                        }
+                                    })
+                                }
+                            })
+
+                            details.abstract = abstract.replace(/\n\n\n\n/g, '\n\n').replace(/\n\n\n/g, '\n\n')
+                        }
+                        else if(a.name == 'aside') {
+                            a.children.forEach(b => {
+                                if(b.attribs && b.attribs.class == 'speakers') {
+                                    b.children.forEach(c => {
+                                        if(c.name == 'ul') {
+                                            c.children.forEach(d => {
+                                                if(d.name == 'li') {
+                                                    d.children.forEach(e => {
+                                                        if(e.name == 'a') {
+                                                            let id = e.attribs.href.match(/https:\/\/ndcoslo.com\/speaker\/(.+)(\/)*/)[1]
+
+                                                            details.speakers.push(id)
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                                else if(b.attribs && b.attribs.class == 'details') {
+                                    b.children.forEach(c => {
+                                        if(c.name == 'p') {
+                                            c.children.forEach(d => {
+                                                if(d.type == 'text') {
+                                                    if(d.next.name == 'span') {
+                                                        d.next.children.forEach(e => {
+                                                            if(e.type == 'text') {
+                                                                details[d.data.toLowerCase().replace(/\s/g, '')] = e.data
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                })
+
+                fs.writeFileSync(`ndc-oslo/${type}s/${slug}.md`, 
+                    `---\ntitle: ${details.title}\nlink: ${details.link}\nspeakers: [${details.speakers}]\nday: ${details.date}\nstart: ${details.starttime}\nend: ${details.endtime}\n---\n${details.abstract}`)
+            })
+        }
 
         fs.writeFileSync(`ndc-oslo/${page}.json`, JSON.stringify(items))
     })
+
+    
+
+
+    // const agenda = await fetch('https://ndcoslo.com/agenda'),
+    //     agendaBody = await agenda.text(),
+    //     talks = [],
+    //     talkUrls = []
+
+    
+    
+    
+
+    // talkUrls.forEach(talk => {
+    //     const talk = await fetch(talk),
+    //     talkBody = await talk.text()
+
+    //     const $ = 
+
+    // })
 
     return
 }
