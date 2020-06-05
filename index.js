@@ -4,8 +4,8 @@ const express = require('express'),
 	app = express(),
 	bodyParser = require('body-parser'),
 	sgMail = require('@sendgrid/mail'),
-	customers = require('./analytics_emails').customers
-testCustomers = require('./analytics_emails_test').customers
+	customers = require('./_data/analytics_emails').customers
+testCustomers = require('./_data/analytics_emails_test').customers
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 

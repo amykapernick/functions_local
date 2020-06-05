@@ -179,7 +179,7 @@ const fetchAgenda = async () => {
                                     if(a.name == 'h2') {
                                         speaker.name = a.children[0].data
                                     }
-                                    else if(a.attribs && !a.attribs.class) {
+                                    else if(a.attribs && a.attribs.class == 'subtitle') {
                                         speaker.role = a.children[0].data
                                     }
                                 })
@@ -310,26 +310,6 @@ const fetchAgenda = async () => {
 
         fs.writeFileSync(`ndc-oslo/${page}.json`, JSON.stringify(items))
     })
-
-    
-
-
-    // const agenda = await fetch('https://ndcoslo.com/agenda'),
-    //     agendaBody = await agenda.text(),
-    //     talks = [],
-    //     talkUrls = []
-
-    
-    
-    
-
-    // talkUrls.forEach(talk => {
-    //     const talk = await fetch(talk),
-    //     talkBody = await talk.text()
-
-    //     const $ = 
-
-    // })
 
     return
 }
