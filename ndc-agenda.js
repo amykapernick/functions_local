@@ -163,11 +163,11 @@ const fetchAgenda = async () => {
                 })
 
                 fs.writeFileSync(`ndc-oslo/${type}s/${slug}.md`, 
-                    `---\ntitle: ${details.title}\nlink: ${details.link}\nspeakers: [${details.speakers}]\nday: ${details.day}\ntime: ${details.time}\nvenue: ${details.venue}\n---\n${details.abstract}`)
+                    `---\ntags: talks\nlayout: layouts/talk.html\ntitle: ${details.title}\nlink: ${details.link}\nspeakers: [${details.speakers}]\nday: ${details.day}\ntime: ${details.time}\nvenue: ${details.venue}\n---\n${details.abstract}`)
             })
         }
         else if (page == 'speakers') {
-            return
+            // return
             $('section .msnry-container.grid-container .grid-item').map((i, el) => {
                 el.children.forEach(c => {
                     const speaker = {}
@@ -206,7 +206,7 @@ const fetchAgenda = async () => {
             })
 
             speakerUrls.forEach(async (speaker) => {
-                // if(speaker !== 'https://ndcoslo.com/speaker/amy-kapernick/') {
+                // if(speaker !== 'https://ndcoslo.com/speaker/ben-cull/') {
                 //     return
                 // }
 
@@ -261,21 +261,32 @@ const fetchAgenda = async () => {
                                     })
                                 }
                                 else if (a.attribs && a.attribs.class ==  'preamble') {
+                                    let bio = ''
                                     a.children.forEach(b => {
+                                        
                                         if(b.name == 'p') {
-                                            let bio = ''
                                             b.children.forEach(p => {
                                                 if(p.type == 'text') {
-                                                    bio = `${bio}${p.data}`
+                                                    bio = `${bio}${p.data.replace(/(^(\s+))|((\s+)$)/g, '')}`
                                                 }
                                                 else if(p.name == 'br') {
                                                     bio = `${bio}\n`
                                                 }
                                             })
                                             
-                                            profile.bio = bio
+                                            
                                         }
+                                        else {
+                                            if(b.type == 'text') {
+                                                bio = `${bio}${b.data.replace(/(^(\s+))|((\s+)$)/g, '')}`
+                                            }
+                                            else if(b.name == 'br') {
+                                                bio = `${bio}\n`
+                                            }
+                                        }
+                                        
                                     })
+                                    profile.bio = bio
                                 }
                             })
                         }
@@ -311,12 +322,13 @@ const fetchAgenda = async () => {
                     }
 
                     fs.writeFileSync(`ndc-oslo/speakers/${slug}.md`, 
-                    `---\nname: ${profile.name}\nrole: ${profile.role}\nlink: ${profile.link}\nimage: https://ndcoslo.com${profile.image}${profile.socials && `\n${profile.socials.name.toLowerCase()}: '${profile.socials.value}'`}\nsessions: [${profile.sessions}]\n---\n${profile.bio}`)
+                    `---\ntags: speakers\nlayout: layouts/speaker.html\nname: ${profile.name}\nrole: ${profile.role}\nlink: ${profile.link}\nimage: https://ndcoslo.com${profile.image}${profile.socials ? `\n${profile.socials.name.toLowerCase()}: '${profile.socials.value}'` : ``}\nsessions: [${profile.sessions}]\n---\n${profile.bio}`)
                 })
             })
 
         }
         else if (page == 'workshops') {
+            return
             $('section.day .msnry-container.grid-container').map((i, el) => {
                 el.children.forEach(a => {
                     if(a.name == 'div') {
@@ -461,32 +473,12 @@ const fetchAgenda = async () => {
                 })
 
                 fs.writeFileSync(`ndc-oslo/${type}s/${slug}.md`, 
-                    `---\ntitle: ${details.title}\nlink: ${details.link}\nspeakers: [${details.speakers}]\nday: ${details.date}\nstart: ${details.starttime}\nend: ${details.endtime}\n---\n${details.abstract}`)
+                    `---\ntags: workshops\nlayout: layouts/workshop.html\ntitle: ${details.title}\nlink: ${details.link}\nspeakers: [${details.speakers}]\nday: ${details.date}\nstart: ${details.starttime}\nend: ${details.endtime}\n---\n${details.abstract}`)
             })
         }
 
         fs.writeFileSync(`ndc-oslo/${page}.json`, JSON.stringify(items))
     })
-
-    
-
-
-    // const agenda = await fetch('https://ndcoslo.com/agenda'),
-    //     agendaBody = await agenda.text(),
-    //     talks = [],
-    //     talkUrls = []
-
-    
-    
-    
-
-    // talkUrls.forEach(talk => {
-    //     const talk = await fetch(talk),
-    //     talkBody = await talk.text()
-
-    //     const $ = 
-
-    // })
 
     return
 }
