@@ -18,88 +18,45 @@ const imports = async () => {
 			Business: process.env.PLUTIO_SUBDOMAIN
 		},
 	}).then(res => res.json()).then(result => result.accessToken),
-		api = 'companies',
+		api = 'invoices',
 		headers = {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${accessToken}`,
 			Business: process.env.PLUTIO_SUBDOMAIN
 		}
 
-	// fetch(`https://api.plutio.com/v1.7/${api}`, {
+	// fetch(`https://api.plutio.com/v1.7/${deleteAPI}`, {
 	// 	method: 'get',
 	// 	headers: headers,
 	// }).then(res => res.json()).then(res => {
-	// 	console.log(res)
-	// 	res.forEach(e => {
-	// 		console.log(e.websiteLinks)
-	// 		console.log(e.people)
+	// 	res.forEach(p => {
+	// 		console.log(p.title)
+	// 		if (p['_id'] !== 'niccpHcGJ7vvQHuWm' && p['_id'] !== 'WbGg4pA4nDyi5TARD') {
+	// 			fetch(`https://api.plutio.com/v1.7/${deleteAPI}`, {
+	// 				method: 'delete',
+	// 				body: JSON.stringify({
+	// 					'_id': p['_id'],
+	// 					status: 'deleted'
+	// 				}),
+	// 				headers: headers,
+	// 			})
+	// 		}
 	// 	})
 	// })
 
-	const clients = await csv({
-		noheader: false,
-		delimiter: ","
-	})
-		.fromString(fs.readFileSync('_data/clients.csv', 'utf8'))
-		.then(jsonObj => {
-			return jsonObj;
-		});
+	fetch(`https://api.plutio.com/v1.7/${api}`, {
+		method: 'put',
+		headers: headers,
+		body: JSON.stringify({
+			"_id": "jBrHMWiisaeTY5ms4",
+			"client": {
+				"_id": "kMYPaJwoZvcQxuQqu",
+				"entityType": "company"
+			}
+		})
+	}).then(res => res.json()).then(res => { console.log(res) })
 
-	clients.forEach(async d => {
-		const contact = d.first && await fetch(`https://api.plutio.com/v1.7/people`, {
-			method: 'post',
-			body: JSON.stringify({
-				"name": {
-					"first": d.first,
-					"last": d.last
-				},
-				"status": "active",
-				"invite": false,
-				"email": d.email,
-				"role": "client"
-			}),
-			headers: headers,
-		}).then(res => res.json()).then(res => res['_id'])
 
-		let details = d
-
-		if (!contact) {
-			details.contactEmails = [{
-				address: d.email,
-				type: 'email'
-			}]
-		}
-		else {
-			details.people = [
-				{
-					"_id": contact
-				}
-			]
-		}
-
-		details.address = {
-			street: d.address,
-			city: `${d.city}, ${d.state}`,
-			country: d.country,
-			zipCode: d.postcode
-		}
-
-		fetch(`https://api.plutio.com/v1.7/${api}`, {
-			method: 'post',
-			body: JSON.stringify({
-				...details,
-				title: d.company,
-				websiteLinks: [
-					{
-						url: d.website,
-						type: "website",
-						title: "Company Website"
-					}
-				]
-			}),
-			headers: headers,
-		}).then(res => res.json()).then(res => console.log(res))
-	})
 }
 
 imports()
