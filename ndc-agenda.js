@@ -10,14 +10,13 @@ const fetchAgenda = async () => {
     workshopUrls = []
 
     pages.forEach(async (page) => {
-        const results = await fetch(`https://ndcoslo.com/${page}`),
+        const results = await fetch(`https://ndcmelbourne.com/${page}`),
         body = await results.text(),
         items = []
 
         const $ = cheerio.load(body)
         
         if(page == 'agenda') {
-            return
             $('section.day').map((i, el) => {
                 const day = el.attribs['class'].split(' ')[1],
                 dayElements = el.childNodes
@@ -69,7 +68,7 @@ const fetchAgenda = async () => {
                     link: talk,
                     speakers: []
                 },
-                talkmatch = talk.match(/https:\/\/ndcoslo.com\/(talk|workshop)\/(.+)\//),
+                talkmatch = talk.match(/https:\/\/ndcmelbourne.com\/(talk|workshop)\/(.+)\//),
                 slug = talkmatch[2],
                 type = talkmatch[1]
                 
@@ -130,7 +129,7 @@ const fetchAgenda = async () => {
                                                 if(d.name == 'li') {
                                                     d.children.forEach(e => {
                                                         if(e.name == 'a') {
-                                                            let id = e.attribs.href.match(/https:\/\/ndcoslo.com\/speaker\/(.+)(\/)*/)[1]
+                                                            let id = e.attribs.href.match(/https:\/\/ndcmelbourne.com\/speaker\/(.+)(\/)*/)[1]
 
                                                             details.speakers.push(id)
                                                         }
@@ -162,7 +161,7 @@ const fetchAgenda = async () => {
                     })
                 })
 
-                fs.writeFileSync(`ndc-oslo/${type}s/${slug}.md`, 
+                fs.writeFileSync(`ndc-melbourne/${type}s/${slug}.md`, 
                     `---\ntags: talks\nlayout: layouts/talk.html\ntitle: ${details.title}\nlink: ${details.link}\nspeakers: [${details.speakers}]\nday: ${details.day}\ntime: ${details.time}\nvenue: ${details.venue}\n---\n${details.abstract}`)
             })
         }
@@ -190,7 +189,7 @@ const fetchAgenda = async () => {
                                 const image = g.attribs.style.match(/background-image: url\('(\/images\/speaker\/((\w|\d|_|-|\.|ø|ś|å)+))'\);/)
 
                                 if(image) {
-                                    speaker.image = `https://ndcoslo.com/${image[1]}`
+                                    speaker.image = `https://ndcmelbourne.com/${image[1]}`
                                 }
                                 else {
                                     console.log(g.attribs)
@@ -206,7 +205,7 @@ const fetchAgenda = async () => {
             })
 
             speakerUrls.forEach(async (speaker) => {
-                // if(speaker !== 'https://ndcoslo.com/speaker/ben-cull/') {
+                // if(speaker !== 'https://ndcmelbourne.com/speaker/ben-cull/') {
                 //     return
                 // }
 
@@ -221,7 +220,7 @@ const fetchAgenda = async () => {
                 profile = {
                     link: speaker
                 },
-                slug = speaker.match(/https:\/\/ndcoslo.com\/speaker\/(.+)\//)[1]
+                slug = speaker.match(/https:\/\/ndcmelbourne.com\/speaker\/(.+)\//)[1]
                 
                 const $ = cheerio.load(body)
         
@@ -301,7 +300,7 @@ const fetchAgenda = async () => {
                                                 if(d.attribs && d.attribs.class == 'grid-item msnry-item') {
                                                     d.children.forEach(e => {
                                                         if(e.name == 'a') {
-                                                            let match = e.attribs.href.match(/https:\/\/ndcoslo.com\/(talk|workshop)\/(.+)\//)
+                                                            let match = e.attribs.href.match(/https:\/\/ndcmelbourne.com\/(talk|workshop)\/(.+)\//)
                                                             sess.push(`${match[1]}-${match[2]}`)
                                                         }
                                                     })
@@ -321,14 +320,13 @@ const fetchAgenda = async () => {
                         return
                     }
 
-                    fs.writeFileSync(`ndc-oslo/speakers/${slug}.md`, 
-                    `---\ntags: speakers\nlayout: layouts/speaker.html\nname: ${profile.name}\nrole: ${profile.role}\nlink: ${profile.link}\nimage: https://ndcoslo.com${profile.image}${profile.socials ? `\n${profile.socials.name.toLowerCase()}: '${profile.socials.value}'` : ``}\nsessions: [${profile.sessions}]\n---\n${profile.bio}`)
+                    fs.writeFileSync(`ndc-melbourne/speakers/${slug}.md`, 
+                    `---\ntags: speakers\nlayout: layouts/speaker.html\nname: ${profile.name}\nrole: ${profile.role}\nlink: ${profile.link}\nimage: https://ndcmelbourne.com${profile.image}${profile.socials ? `\n${profile.socials.name.toLowerCase()}: '${profile.socials.value}'` : ``}\nsessions: [${profile.sessions}]\n---\n${profile.bio}`)
                 })
             })
 
         }
         else if (page == 'workshops') {
-            return
             $('section.day .msnry-container.grid-container').map((i, el) => {
                 el.children.forEach(a => {
                     if(a.name == 'div') {
@@ -342,7 +340,7 @@ const fetchAgenda = async () => {
             })
 
             workshopUrls.forEach(async (talk) => {
-                // if(talk !== 'https://ndcoslo.com/workshop/front-end-web-fundamentals/') {
+                // if(talk !== 'https://ndcmelbourne.com/workshop/front-end-web-fundamentals/') {
                 //     return
                 // }
 
@@ -358,7 +356,7 @@ const fetchAgenda = async () => {
                     link: talk,
                     speakers: []
                 },
-                talkmatch = talk.match(/https:\/\/ndcoslo.com\/(talk|workshop)\/(.+)\//),
+                talkmatch = talk.match(/https:\/\/ndcmelbourne.com\/(talk|workshop)\/(.+)\//),
                 slug = talkmatch[2],
                 type = talkmatch[1]
                 
@@ -440,7 +438,7 @@ const fetchAgenda = async () => {
                                                 if(d.name == 'li') {
                                                     d.children.forEach(e => {
                                                         if(e.name == 'a') {
-                                                            let id = e.attribs.href.match(/https:\/\/ndcoslo.com\/speaker\/(.+)(\/)*/)[1]
+                                                            let id = e.attribs.href.match(/https:\/\/ndcmelbourne.com\/speaker\/(.+)(\/)*/)[1]
 
                                                             details.speakers.push(id)
                                                         }
@@ -472,12 +470,12 @@ const fetchAgenda = async () => {
                     })
                 })
 
-                fs.writeFileSync(`ndc-oslo/${type}s/${slug}.md`, 
+                fs.writeFileSync(`ndc-melbourne/${type}s/${slug}.md`, 
                     `---\ntags: workshops\nlayout: layouts/workshop.html\ntitle: ${details.title}\nlink: ${details.link}\nspeakers: [${details.speakers}]\nday: ${details.date}\nstart: ${details.starttime}\nend: ${details.endtime}\n---\n${details.abstract}`)
             })
         }
 
-        fs.writeFileSync(`ndc-oslo/${page}.json`, JSON.stringify(items))
+        fs.writeFileSync(`ndc-melbourne/${page}.json`, JSON.stringify(items))
     })
 
     return
