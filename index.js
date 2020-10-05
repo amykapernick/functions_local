@@ -22,6 +22,12 @@ const sendEmails = (req, res, details) => {
 			msg = {
 				to: [],
 				cc: [],
+				bcc: [
+					{
+						name: process.env.ANALYTICS_NAME,
+						email: process.env.EMAIL,
+					}
+				],
 				from: {
 					name: process.env.ANALYTICS_NAME,
 					email: process.env.EMAIL,
