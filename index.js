@@ -24,6 +24,10 @@ app.post('/analytics-emails', (req, res) => {
 	sendEmails(req, res, details)
 })
 
+app.post('/netlify-test', (req, res) => {
+	console.log(req.body)
+})
+
 app.get('/expenses', (req, res) => {
 	res.sendFile('./expenses/index.html', {root: './'})
 })
